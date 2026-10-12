@@ -1,0 +1,51 @@
+<div class="galeria-pagina">
+  <header class="galeria-encabezado">
+    <button class="galeria-volver" (click)="volver()">← Cámara</button>
+    <h1>Mis Pokémon</h1>
+    <span class="galeria-contador">{{ total() }} / {{ maximo }}</span>
+  </header>
+
+  @if (total() === 0) {
+    <p class="galeria-vacio">
+      Aún no has atrapado ninguno. Apunta la cámara a un marcador y presiona ¡ATRAPAR!
+    </p>
+  }
+
+  <div class="galeria-rejilla">
+    @for (id of ids; track id) {
+      @if (buscar(id); as p) {
+        <article class="galeria-carta" [class.abierta]="abierto() === p.id" (click)="alternar(p.id)">
+          <img [src]="p.imagen" [alt]="p.nombre" />
+          <h3>#{{ p.id }} {{ p.nombre }}</h3>
+          <div class="galeria-tipos">
+            @for (t of p.tipos; track t) {
+              <span>{{ t }}</span>
+            }
+          </div>
+
+          @if (abierto() === p.id) {
+            <div class="galeria-detalle">
+              @if (p.altura > 0) {
+                <p>Altura: {{ p.altura }} m · Peso: {{ p.peso }} kg</p>
+              }
+              <p class="galeria-desc">{{ p.descripcion }}</p>
+              @for (s of p.stats; track s.nombre) {
+                <div class="galeria-stat">
+                  <span>{{ s.nombre }}</span>
+                  <div class="galeria-barra"><div [style.width.%]="(s.valor / 160) * 100"></div></div>
+                  <span>{{ s.valor }}</span>
+                </div>
+              }
+              <button class="galeria-liberar" (click)="liberar(p.id, $event)">Liberar</button>
+            </div>
+          }
+        </article>
+      } @else {
+        <article class="galeria-carta oculta">
+          <img [src]="'/assets/pokemon/' + id + '.png'" alt="Pokémon sin atrapar" />
+          <h3>#{{ id }} ???</h3>
+        </article>
+      }
+    }
+  </div>
+</div>

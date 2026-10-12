@@ -1,20 +1,56 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="ra-fondo">
+  <iframe src="/assets/ar.html" allow="camera" class="ra-frame"></iframe>
+</div>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<button class="btn-galeria" (click)="irGaleria()">
+  📖 Galería ({{ total() }}/{{ maximo }})
+</button>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+@if (mensaje()) {
+  <div class="aviso">{{ mensaje() }}</div>
+}
+
+@if (cargando()) {
+  <div class="tarjeta">
+    <p class="buscando">Buscando datos del Pokémon...</p>
   </div>
-</ion-content>
+}
+
+@if (detectado(); as p) {
+  <div class="tarjeta">
+    <div class="cabecera">
+      <img [src]="p.imagen" [alt]="p.nombre" />
+      <div>
+        <h2>#{{ p.id }} {{ p.nombre }}</h2>
+        <div class="tipos">
+          @for (t of p.tipos; track t) {
+            <span class="tipo">{{ t }}</span>
+          }
+        </div>
+        @if (p.altura > 0) {
+          <p class="medidas">Altura: {{ p.altura }} m · Peso: {{ p.peso }} kg</p>
+        }
+      </div>
+    </div>
+
+    <p class="descripcion">{{ p.descripcion }}</p>
+
+    @if (p.stats.length > 0) {
+      <div class="stats">
+        @for (s of p.stats; track s.nombre) {
+          <div class="stat">
+            <span class="stat-nombre">{{ s.nombre }}</span>
+            <div class="barra"><div class="relleno" [style.width.%]="(s.valor / 160) * 100"></div></div>
+            <span class="stat-valor">{{ s.valor }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    @if (yaAtrapado()) {
+      <button class="btn-atrapar atrapado" disabled>✔ Ya lo tienes en tu galería</button>
+    } @else {
+      <button class="btn-atrapar" (click)="atrapar(p)">¡ATRAPAR!</button>
+    }
+  </div>
+}

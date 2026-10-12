@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
+    <script>
+      // Hace que la imagen del Pokémon siempre mire hacia la cámara
+      AFRAME.registerComponent('mirar-camara', {
+        tick: function () {
+          var cam = this.el.sceneEl.camera;
+          if (!cam) return;
+          var pos = new AFRAME.THREE.Vector3();
+          cam.getWorldPosition(pos);
+          this.el.object3D.lookAt(pos);
+        },
+      });
+    </script>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <a-scene
+      embedded
+      vr-mode-ui="enabled: false"
+      arjs="debugUIEnabled: false; sourceType: webcam; sourceWidth: 480; sourceHeight: 640; displayWidth: 480; displayHeight: 640; maxDetectionRate: 30;"
+    >
+      <!-- Un marcador por Pokémon. data-id es el número en la Pokédex -->
+
+      <a-marker type="pattern" url="/assets/patt/pikachu.patt" data-id="25" smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2">
+        <a-entity position="0 0.9 0" animation="property: position; to: 0 1.05 0; dir: alternate; dur: 900; loop: true; easing: easeInOutSine">
+          <a-image src="/assets/pokemon/25.png" width="1.3" height="1.3" mirar-camara></a-image>
+        </a-entity>
+      </a-marker>
+
+      <a-marker type="pattern" url="/assets/patt/charmander.patt" data-id="4" smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2">
+        <a-entity position="0 0.9 0" animation="property: position; to: 0 1.05 0; dir: alternate; dur: 900; loop: true; easing: easeInOutSine">
+          <a-image src="/assets/pokemon/4.png" width="1.3" height="1.3" mirar-camara></a-image>
+        </a-entity>
+      </a-marker>
+
+      <a-marker type="pattern" url="/assets/patt/bulbasaur.patt" data-id="1" smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2">
+        <a-entity position="0 0.9 0" animation="property: position; to: 0 1.05 0; dir: alternate; dur: 900; loop: true; easing: easeInOutSine">
+          <a-image src="/assets/pokemon/1.png" width="1.3" height="1.3" mirar-camara></a-image>
+        </a-entity>
+      </a-marker>
+
+      <a-marker type="pattern" url="/assets/patt/squirtle.patt" data-id="7" smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2">
+        <a-entity position="0 0.9 0" animation="property: position; to: 0 1.05 0; dir: alternate; dur: 900; loop: true; easing: easeInOutSine">
+          <a-image src="/assets/pokemon/7.png" width="1.3" height="1.3" mirar-camara></a-image>
+        </a-entity>
+      </a-marker>
+
+      <a-marker type="pattern" url="/assets/patt/eevee.patt" data-id="133" smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2">
+        <a-entity position="0 0.9 0" animation="property: position; to: 0 1.05 0; dir: alternate; dur: 900; loop: true; easing: easeInOutSine">
+          <a-image src="/assets/pokemon/133.png" width="1.3" height="1.3" mirar-camara></a-image>
+        </a-entity>
+      </a-marker>
+
+      <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+      // Avisa a la app de Ionic cuándo se ve o se pierde un marcador
+      document.querySelectorAll('a-marker').forEach(function (m) {
+        var id = Number(m.getAttribute('data-id'));
+        m.addEventListener('markerFound', function () {
+          window.parent.postMessage({ tipo: 'encontrado', id: id }, window.location.origin);
+        });
+        m.addEventListener('markerLost', function () {
+          window.parent.postMessage({ tipo: 'perdido', id: id }, window.location.origin);
+        });
+      });
+
+      // Intenta alejar el zoom de la cámara si el celular lo permite
+      window.addEventListener('arjs-video-loaded', function () {
+        try {
+          var video = document.getElementById('arjs-video');
+          var track = video.srcObject.getVideoTracks()[0];
+          var cap = track.getCapabilities();
+          if (cap.zoom) {
+            track.applyConstraints({ advanced: [{ zoom: cap.zoom.min }] });
+          }
+        } catch (e) {}
+      });
+    </script>
+  </body>
+</html>
